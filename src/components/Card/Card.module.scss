@@ -1,0 +1,16 @@
+.cardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .cardChild {
+    flex: 0 1 150px;
+    flex: 1 1 150px;
+    margin: 5px;
+
+    border: 1px solid red;
+    background: lightpink;
+    font-size: 2rem;
+    text-align: center;
+  }
+}
