@@ -3,7 +3,7 @@ import styles from './Card.module.scss';
 
 export default function Card({
   name,
-  id
+  id,
 }){
   return(
     <div className={styles.cardContainer}>

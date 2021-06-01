@@ -6,43 +6,56 @@ import Card from './components/Card/Card';
 
 function App() {
   const [treecko, setTreecko] = useState([]);
+  const [error, isError] = useState(false);
 
-  function getListPokemon(){
-    const list = []
-    api.get('?limit=9&offset=40')
-      .then(response => {
-        // list.push(response.data.results.name);
-        console.log(response.data.results.name)
-      })
-  }
-  getListPokemon();
+  
 
   useEffect(()=>{
-    function pokeApiList(){
-      api.get('/treecko')
-      .then(response =>{
-        setTreecko(response.data);
-        // console.log(response.data);
+    let list = [];
+
+    getListPokemon();
+    pokeApiList(list);
+
+    function getListPokemon(){     
+      api.get('?limit=9&offset=40')
+        .then(response => {
+          const result = response.data.results
+          result.forEach(names => {
+            return list.push(names.name)
+          });
+          console.log('response', response.data.results)
+          console.log('lista', list)
+        })
+    }
+    function pokeApiList(...list){
+      list.forEach((name)=>{
+        api.get(`/${name}`)
+        .then(response =>{
+          setTreecko(response.data);
+          isError(true)
+          
+        })
+        .catch((e)=>{
+        isError(false)
+      })
       })
     }
-
-    pokeApiList();    
+    
+    
   },[])
-
+  // console.log(treecko);
   return (
     <div className="App">
-      <Card 
-        id={treecko.id}
-        name={treecko.name}
+      {treecko.map((name, indice) =>{
+        <Card
+        key={indice}
+        id={name[indice].id}
+        name={name[indice].name}
       />
-      <Card 
-        id={treecko.id}
-        name={treecko.name}
-      />
-      <Card 
-        id={treecko.id}
-        name={treecko.name}
-      />
+      })}  
+      {error ||
+        (<h1>Erro, tente novamente mais tarde</h1>)
+      }
     </div>
   );
 }
