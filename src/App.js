@@ -6,54 +6,40 @@ import Card from './components/Card/Card';
 
 function App() {
   const [treecko, setTreecko] = useState([]);
-  const [error, isError] = useState(false);
+  const [error, isError] = useState(false); 
 
-  
+  useEffect(() => {
+    api.get('?limit=9&offset=40').then(response => {
+      const result = response.data.results
+      console.log('result', result)
 
-  useEffect(()=>{
-    let list = [];
+      const pokemonsRequests = result.map(pokemon => api.get(`/${pokemon.name}`));
 
-    getListPokemon();
-    pokeApiList(list);
-
-    function getListPokemon(){     
-      api.get('?limit=9&offset=40')
-        .then(response => {
-          const result = response.data.results
-          result.forEach(names => {
-            return list.push(names.name)
-          });
-          console.log('response', response.data.results)
-          console.log('lista', list)
+        Promise.all(pokemonsRequests).then(pokemons => {
+          setTreecko(pokemons);
+          isError(true);
+          console.log('promise', pokemons)});  
         })
-    }
-    function pokeApiList(...list){
-      list.forEach((name)=>{
-        api.get(`/${name}`)
-        .then(response =>{
-          setTreecko(response.data);
-          isError(true)
-          
-        })
-        .catch((e)=>{
-        isError(false)
-      })
-      })
-    }
-    
-    
-  },[])
-  // console.log(treecko);
+    console.log('treecko', treecko);
+  }, []);
+
+  console.log('treecko 2', treecko);
+
   return (
     <div className="App">
-      {treecko.map((name, indice) =>{
-        <Card
-        key={indice}
-        id={name[indice].id}
-        name={name[indice].name}
-      />
-      })}  
-      {error ||
+
+      {treecko.length?
+      (treecko.map((item, idx) =>{
+        return <Card
+          key={idx}
+          id={item.data.id}
+          name={item.data.name}
+        />
+        })
+      ):(
+        <h1>Is Loading</h1>
+      ) } 
+      {error &&
         (<h1>Erro, tente novamente mais tarde</h1>)
       }
     </div>
